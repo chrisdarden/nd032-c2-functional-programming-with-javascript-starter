@@ -1,3 +1,5 @@
+//const res = require("express/lib/response")
+
 let store = {
     user: { name: "Student" },
     apod: '',
@@ -22,12 +24,16 @@ const App = (state) => {
     let { rovers, apod } = state
 
     return `
-        <header></header>
+        <header><link rel="stylesheet" href="./assets/stylesheets/index.css" media="screen" type="text/css" /></header>
         <main>
             ${Greeting(store.user.name)}
             <section>
-                <h3>Put things on the page!</h3>
-                <p>Here is an example section.</p>
+                <h3>Choose a Rover!</h3>
+                <div class="container">
+                <div class="rover"><h4>${store.rovers[0]}</div>
+                <div class="rover"><h4>${store.rovers[1]}</div>
+                <div class="rover"><h4>${store.rovers[2]}</div>
+                </div>
                 <p>
                     One of the most popular websites at NASA is the Astronomy Picture of the Day. In fact, this website is one of
                     the most popular websites across all federal agencies. It has the popular appeal of a Justin Bieber video.
@@ -48,6 +54,9 @@ window.addEventListener('load', () => {
     render(root, store)
 })
 
+document.addEventListener('click', (e) => {
+    e.getRoverInfo(state)
+})
 // ------------------------------------------------------  COMPONENTS
 
 // Pure function that renders conditional information -- THIS IS JUST AN EXAMPLE, you can delete it.
@@ -102,4 +111,14 @@ const getImageOfTheDay = (state) => {
         .then(apod => updateStore(store, { apod }))
 
     return data
+}
+
+const getRoverInfo = (state) => {
+    let { roverClicked } = state
+
+    console.log("state is: " + state)
+
+    fetch(`http://localhost:3000/${roverClicked}`)
+    .then(res => console.log(res))
+    return roverClicked
 }
