@@ -1,13 +1,20 @@
-//const res = require("express/lib/response")
+// const res = require("express/lib/response")
 
+// const res = require("express/lib/response")
+
+//const res = require("express/lib/response")
 let store = {
     user: { name: "Student" },
+    photos: {},
     apod: '',
     rovers: ['Curiosity', 'Opportunity', 'Spirit'],
+    
 }
+let roverClicked 
 
 // add our markup to the page
 const root = document.getElementById('root')
+const curiosityBtn = document.getElementById("curiosity")
 
 const updateStore = (store, newState) => {
     store = Object.assign(store, newState)
@@ -16,10 +23,45 @@ const updateStore = (store, newState) => {
 
 const render = async (root, state) => {
     root.innerHTML = App(state)
+    clickableBtn()
+    modal()
 }
 
 
 // create content
+
+
+function clickableBtn() {
+    let btn = document.querySelectorAll('.btn')
+    btn.forEach(btn => btn.addEventListener('click', (e) => {
+        const rover = e.target.textContent
+        getRecentPhotos(rover)
+        roverClicked = true
+    }))
+}
+
+function modal() {
+
+    let detailBtn = document.querySelectorAll('.detail-btn')
+    let modal = document.querySelector('.modal')
+    let closeBtn = document.querySelector('.close-btn')
+
+    closeBtn.addEventListener('click', () => {
+        modal.style.display = 'none'
+    })
+    
+    detailBtn.forEach(btn => btn.addEventListener('click', e => {
+        getRoverInfo(e.target.dataset.key)
+        roverClicked = false
+    }))
+    if (roverClicked || !store.roverDetail?.rover) return
+    showModal()
+
+    function showModal() {
+        modal.style.display = 'block'
+    }
+}
+
 const App = (state) => {
     let { rovers, apod } = state
 
@@ -28,12 +70,37 @@ const App = (state) => {
         <main>
             ${Greeting(store.user.name)}
             <section>
-                <h3>Choose a Rover!</h3>
+                <h3>Choose a Mars Rover</h3>
                 <div class="container">
-                <div class="rover"><h4>${store.rovers[0]}</div>
-                <div class="rover"><h4>${store.rovers[1]}</div>
-                <div class="rover"><h4>${store.rovers[2]}</div>
+                <section class='card'>
+                <div class="tab-menu">
+                <ul class="list">
+                <li>
+                    <div class="btn">${rovers[0]}</div>
+                    <button class="detail-btn" data-key="${rovers[0]}">More Details</button>
+                </li>
+                <li>
+                <div class="btn">${rovers[1]}</div>
+                <button class="detail-btn"  data-key="${rovers[1]}">More Details</button>
+                </li>
+                <li>
+                <div class="btn">${rovers[2]}</div>
+                <button class="detail-btn"  data-key="${rovers[2]}">More Details</button>
+                </li>
+                </ul>
                 </div>
+                </section>
+                <section class='card'>
+                ${SelectedRoverPhoto()}
+                </section>
+                <section><div class="modal">
+                <div class="modal-content">
+                <span class="close-btn">X</span>
+                ${RoverDetail()}
+                
+                </div>
+            </div>
+            </div></section>
                 <p>
                     One of the most popular websites at NASA is the Astronomy Picture of the Day. In fact, this website is one of
                     the most popular websites across all federal agencies. It has the popular appeal of a Justin Bieber video.
@@ -42,7 +109,9 @@ const App = (state) => {
                     explanation are returned. These keywords could be used as auto-generated hashtags for twitter or instagram feeds;
                     but generally help with discoverability of relevant imagery.
                 </p>
-                ${ImageOfTheDay(apod)}
+                <div class="apod">
+                <h1>NASA's Image of the day!</h1>
+                ${ImageOfTheDay(apod)}</div>
             </section>
         </main>
         <footer></footer>
@@ -54,9 +123,7 @@ window.addEventListener('load', () => {
     render(root, store)
 })
 
-document.addEventListener('click', (e) => {
-    e.getRoverInfo(state)
-})
+
 // ------------------------------------------------------  COMPONENTS
 
 // Pure function that renders conditional information -- THIS IS JUST AN EXAMPLE, you can delete it.
@@ -78,9 +145,7 @@ const ImageOfTheDay = (apod) => {
     // If image does not already exist, or it is not from today -- request it again
     const today = new Date()
     const photodate = new Date(apod.date)
-    console.log(photodate.getDate(), today.getDate());
 
-    console.log(photodate.getDate() === today.getDate());
     if (!apod || apod.date === today.getDate() ) {
         getImageOfTheDay(store)
     }
@@ -110,15 +175,68 @@ const getImageOfTheDay = (state) => {
         .then(res => res.json())
         .then(apod => updateStore(store, { apod }))
 
-    return data
+    return
 }
 
-const getRoverInfo = (state) => {
-    let { roverClicked } = state
+const SelectedRoverPhoto = () => {
+    
+    const photos = store.photos
+    const photoArrays = Object.values(photos)
+    if (!photoArrays.length > 0) return `<div> Choose rover above in blue button for most recent pictures to load </div>`
+    return photoArrays[0].map(photo => {
+        return (
+            ` <img key="${photo.id}" src="${photo.img_src}" class="rover-img"/>`)
+    }).join('')
 
-    console.log("state is: " + state)
+}
 
-    fetch(`http://localhost:3000/${roverClicked}`)
-    .then(res => console.log(res))
-    return roverClicked
+const RoverDetail = () => {
+    if (store.roverDetail?.rover) {
+        const { landing_date, launch_date, max_date, max_sol, name, status } = store.roverDetail.rover
+        return (
+            `
+            <div class="modal-detail">
+            <div>name : ${name}</div>
+            <div>status : ${status}</div>
+            <div>landing date : ${landing_date}</div>
+            <div>launch date : ${launch_date}</div>
+            <div>max date : ${max_date}</div>
+            <div>max sol : ${max_sol}</div>
+            </div>
+            `
+        )
+    }
+    return `<div>Rover details error</div>`
+}
+
+
+const getRecentPhotos = (rover_name) => {
+    return fetch(`http://localhost:3000/photos/${rover_name}`)
+        .then(res => res.json())
+        .then(result => 
+            updateStore(store, {
+                photos: { [rover_name]: [...result.latest_photos]}
+            }))
+            return 
+}
+
+const getRoverInfo = (rover_name) => {
+    if (!rover_name) return
+    return fetch(`http://localhost:3000/rover/${rover_name}`)
+        .then(res => res.json())
+        .then(({ photo_manifest }) => {
+            const { landing_date, launch_date, max_date, max_sol, name, status } = photo_manifest
+            updateStore(store, {
+                roverDetail: {
+                    rover: {
+                        landing_date,
+                        launch_date,
+                        max_date,
+                        max_sol,
+                        name,
+                        status,
+                    }
+                }
+            })
+        })
 }

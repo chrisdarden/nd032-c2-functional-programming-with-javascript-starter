@@ -17,7 +17,7 @@ app.use('/', express.static(path.join(__dirname, '../public')))
 // example API call
 app.get('/apod', async (req, res) => {
     try {
-        let image = await fetch(`https://api.nasa.gov/planetary/apod?api_key=${process.env.API_KEY}`)
+        const image = await fetch(`https://api.nasa.gov/planetary/apod?api_key=${process.env.API_KEY}`)
             .then(res => res.json())
         res.send({ image })
     } catch (err) {
@@ -25,14 +25,29 @@ app.get('/apod', async (req, res) => {
     }
 })
 
-app.get('/curiosity', async (req, res) => {
+app.get('/photos/:rover_name', async (req, res) => {
+    let rover_name = req.params.rover_name
+    console.log(rover_name)
     try {
-        let image = await fetch('https://api.nasa.gov/mars-photos/api/v1/rovers/curiosity/photos?earth_date=2015-6-3&api_key=${process.env.API_KEY}')
-            .then(res = res.json())
-            res.send({ image })
-        
-    } catch (err) {
-        console.log('error:', err);
+        const photos = await fetch(`https://api.nasa.gov/mars-photos/api/v1/rovers/${rover_name}/latest_photos?api_key=${process.env.API_KEY}`)
+            .then(res => res.json())
+        res.send(photos)
+    }
+    catch (err) {
+        console.log('/rovers error:', err)
+    }
+})
+
+app.get('/rover/:rover_name', async (req, res) => {
+    let rover_name = req.params.rover_name
+    try {
+        const rovers = await fetch(`https://api.nasa.gov/mars-photos/api/v1/manifests/${rover_name}?api_key=${process.env.API_KEY}`)
+            .then(res => res.json())
+        res.send(rovers)
+    }
+    catch (err) {
+        console.log('/mission manifest error', err)
+
     }
 })
 

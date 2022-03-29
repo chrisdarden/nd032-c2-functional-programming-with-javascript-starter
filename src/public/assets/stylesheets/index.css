@@ -11,14 +11,134 @@ h3 {
   text-align: center;
 }
 
-header {
-  /* header styles */
+section {
+  margin-top: 15px;
 }
 
-.container {
+section > .rover-img {
+  width: 400px;
+  height: auto;
+  margin: 5px auto;
+}
+
+li ul {
+  list-style-type: none;
+}
+
+.tab-menu .list {
   display: flex;
-  flex-direction: row;
   justify-content: space-around;
+  align-items: center;
+  list-style-type: none;
+}
+.tab-menu .list li {
+  margin: 0 auto;
+  list-style-type: none;
+}
+.tab-menu .list .btn {
+  list-style-type: none;
+  padding: 10px 20px;
+  background-color: rgb(35, 9, 94);
+  color: #fff;
+  margin-bottom: 15px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: 0.4s;
+  text-align: center;
+  font-size: 24px;
+}
+
+.tab-menu .list .btn:hover {
+  background-color: rgb(17, 91, 94);
+}
+
+.card {
+  text-align: center;
+  font-size: 20px;
+  border-radius: 8px;
+  margin: 20px 10px;
+  padding: 10px 20px;
+  background-color: rgba(223, 223, 223, 0.719);
+}
+
+h1 {
+  text-align: center;
+}
+
+.card > .desc {
+  color: #333;
+  font-weight: 300;
+  font-size: 20px;
+}
+
+.apod {
+  display: block;
+  width: 60%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  padding-top: 50px;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+.modal-content {
+  position: relative;
+  background-color: grey;
+  color: white;
+  padding: 20px;
+  margin: auto;
+  width: 75%;
+  height: 300px;
+  border: 5px solid black;
+}
+.close-btn {
+  float: right;
+  color: lightgray;
+  font-size: 24px;
+  font-weight: bold;
+  cursor: pointer;
+}
+.close-btn:hover {
+  color: darkgray;
+}
+
+.detail-btn {
+  width: 100%;
+  padding: 10px;
+  font-size: 20px;
+  border-radius: 10px;
+  background-color: #fff;
+  color: #333;
+  font-weight: 300;
+  border: 1px solid #333;
+  cursor: pointer;
+}
+
+.modal-detail {
+  font-size: 24px;
+  padding: 20px;
+}
+.modal-detail > div {
+  margin: 10px;
+}
+
+.detail-btn {
+  width: 100%;
+  padding: 10px;
+  font-size: 20px;
+  border-radius: 10px;
+  background-color: #fff;
+  color: #333;
+  font-weight: 300;
+  border: 1px solid #333;
+  cursor: pointer;
 }
 
 main {
@@ -40,7 +160,7 @@ main {
   font-weight: bold;
   padding: 32px 76px;
   text-decoration: none;
-  text-shadow: 0px 1px 0px #ffffff;
+  text-shadow: 0px 1px 0pßx #ffffff;
 }
 .rover:hover {
   background: linear-gradient(to bottom, #f6f6f6 5%, #ffffff 100%);
